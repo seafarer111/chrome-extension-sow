@@ -1,0 +1,25 @@
+.combo-container {
+  text-align: left;
+}
+
+.comboBoxOption {
+  padding: 5px;
+}
+
+.combo-container ul {
+  margin-top: 0px !important;
+  background-color: #1f2120;
+  border: solid 1px #fff;
+  border-radius: 4px !important;
+  max-height: 160px;
+}
+
+.combo-container ul li {
+  color: #fff;
+  background-color: #1f2120 !important;
+}
+
+.combo-container ul li:hover {
+  color: #1f2120;
+  background-color: #f2f6f4 !important;
+}

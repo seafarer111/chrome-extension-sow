@@ -1,0 +1,137 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
+body {
+  font-family: 'Roboto Condensed', sans-serif;
+  background-color: #1f2120;
+  color: #fff;
+  text-align: center;
+  padding: 20px
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+}
+
+span {
+  font-size: 16px;
+  color: #FFF;
+}
+
+.mt-1 {
+  margin-top: 10px;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-text {
+  color: #00d7c3;
+}
+
+h2 {
+  color: #FFF;
+}
+
+.main-container {
+  padding-bottom: 20px;
+}
+
+.d-flex {
+  display: flex;
+  align-items: center;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.success:hover {
+  background-color: #04AA6D;
+  color: white;
+}
+
+/* Blue */
+.info {
+  border-color: #2196F3;
+  color: dodgerblue;
+}
+
+.info:hover {
+  background: #2196F3;
+  color: white;
+}
+
+/*Salesops*/
+
+ul.breadcrumb {
+  padding: 10px 16px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
+
+.clickable {
+  color: #FFF;
+  cursor: pointer;
+}
+
+.clickable:hover {
+  color: #00d7c3;
+  cursor: pointer;
+}
+
+ul.breadcrumb li {
+  display: inline;
+  font-size: 14px;
+  float: left;
+  display: flex;
+  align-items: center;
+}
+
+ul.breadcrumb li+li:before {
+  padding: 8px;
+  color: #FFF;
+  content: "/\00a0";
+}
+
+ul.breadcrumb li a {
+  color: #0275d8;
+  text-decoration: none;
+}
+
+ul.breadcrumb li a:hover {
+  color: #01447e;
+  text-decoration: underline;
+}
+
+/*input url*/
+
+.input_url {
+  border: 2px solid #2196F3;
+  background-color: white;
+  color: black;
+  width: 100%;
+  font-size: 16px;
+  color: #2196F3;
+}
+
+.input_url:focus {
+  background: #2196F3;
+  color: white;
+}
+
+.loading {
+  height: 0;
+  width: 0;
+  padding: 15px;
+  border: 6px solid #ccc;
+  border-right-color: #888;
+  border-radius: 22px;
+  -webkit-animation: rotate 1s infinite linear;
+  position: absolute;
+  left: 46%;
+  top: 50%;
+}

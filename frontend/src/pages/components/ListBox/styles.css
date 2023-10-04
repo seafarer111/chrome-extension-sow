@@ -1,0 +1,39 @@
+.users-list {
+    color: white;
+    height: 150px;
+    overflow-y: auto;
+    border: 1px solid grey;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+
+.user-item {
+    margin: auto;
+    width: 276px;
+    padding: 10px 15px;
+    color: #000;
+    text-decoration: none;
+    text-align: left;
+    float: none;
+    position: relative;
+    display: block;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.active {
+    background-color: #4c84ce;
+    border-radius: 4px;
+}
+
+.user-item:hover {
+    background-color: #4c84ce;
+    border-radius: 4px;
+}
+
+.d-felx {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
