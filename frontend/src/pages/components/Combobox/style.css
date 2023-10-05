@@ -8,18 +8,20 @@
 
 .combo-container ul {
   margin-top: 0px !important;
-  background-color: #1f2120;
+  padding-top: 0px;
+  background-color: #fff;
   border: solid 1px #fff;
   border-radius: 4px !important;
   max-height: 160px;
+  border: solid 2px #00d7c3;
 }
 
 .combo-container ul li {
-  color: #fff;
-  background-color: #1f2120 !important;
+  color: #1f2120;
+  background-color: #FFF !important;
 }
 
 .combo-container ul li:hover {
   color: #1f2120;
-  background-color: #f2f6f4 !important;
+  background-color: #00d7c3 !important;
 }

@@ -4,10 +4,11 @@ import './style.css'
 const RadioButton = (props) => {
 
   return (
-    <p>
-      <input type="radio" id={props.id} checked={props.value} onChange={(e) => {props.setChecked(e.target.checked)}} />
-      <label htmlFor={props.id}>{props.title}</label>
-    </p>
+    <>
+      <input type="radio" id={props.name} name="selector" />
+      <label for={props.name}>{props.name}</label>
+      <div class="check"></div>
+    </>
   )
 }
 

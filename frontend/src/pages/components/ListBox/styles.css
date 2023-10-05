@@ -1,4 +1,5 @@
 .users-list {
+    background: #FFF;
     color: white;
     height: 150px;
     overflow-y: auto;
@@ -9,8 +10,9 @@
 }
 
 .user-item {
+    background-color: #FFF;
     margin: auto;
-    width: 276px;
+    width: 89%;
     padding: 10px 15px;
     color: #000;
     text-decoration: none;
@@ -23,12 +25,12 @@
 }
 
 .active {
-    background-color: #4c84ce;
+    background-color: #00d7c3;
     border-radius: 4px;
 }
 
 .user-item:hover {
-    background-color: #4c84ce;
+    background-color: #00d7c3;
     border-radius: 4px;
 }
 
