@@ -68,7 +68,6 @@ const getGPT = async (req, res, next) => {
       name: "xxx",
       about: "Actively Looking for Change as a front end Developer with 2+ EXP",
       company: "Hyderabad",
-
       url: "345634563456",
     },
     {
@@ -136,10 +135,11 @@ const getGPT = async (req, res, next) => {
   res.send({ ok: true, data: results });
 };
 
-const langChainFunc = async (item) => {
+const langChainFunc = async (item, idx) => {
   const prompt = `Please provide only "true" or "false" if the this member(${item.about}) is matched with the company(${ICP}, also ${ABOUT})`;
   const res = await chain.call({ input: prompt }); // TRUE or FALSE
   return {
+    id: idx,
     name: item.name,
     about: item.title,
     url: item.url,

@@ -10,6 +10,15 @@ const getPeoples = async (req, res, next) => {
   }
 };
 
+const getMatched = async (req, res, next) => {
+  const result = await PeoplesModel.getMatched();
+  if (result) {
+    res.send({ ok: true, items: result.items });
+  } else {
+    throw new HttpException(404, "Something went wrong");
+  }
+};
+
 const createPeople = async (req, res, next) => {
   const company = req.body;
   const result = PeoplesModel.create(company);
@@ -22,4 +31,5 @@ const createPeople = async (req, res, next) => {
 module.exports = {
   getPeoples,
   createPeople,
+  getMatched,
 };

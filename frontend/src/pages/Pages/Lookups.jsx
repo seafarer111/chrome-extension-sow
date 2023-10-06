@@ -51,6 +51,7 @@ const Lookups = () => {
     const res = await GetUsersGPT({
       company: sel
     });
+    console.log(res)
     setPersons(res);
     setSectedOne(res[0]);
     setIsLoading(false);
@@ -68,10 +69,11 @@ const Lookups = () => {
       ) : (
         <>
           <ListBox
-            persons={persons}
-            selectedOne={selecteOne}
-            handleSelectPerson={handleSelectPerson}
-            handlePersonCheck={handlePersonCheck}
+            data={persons}
+            selected={selecteOne}
+            handleSelect={handleSelectPerson}
+            handleCheck={handlePersonCheck}
+            checkBox={true}
           />
           <InputText
             value={selecteOne.name}

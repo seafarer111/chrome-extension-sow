@@ -5,13 +5,15 @@ import Button from '../components/Button';
 import Register from '../Pages/Register';
 import Lookups from '../Pages/Lookups';
 import Recruiting from '../Pages/Recruiting';
+import Review from '../Pages/Review';
 
 const PAGESTATE = {
   DASHBOARD: 'dashboard',
   SALESOPS: 'salesops',
   LOOKUP: 'lookup',
   REGISTER: 'register',
-  RECRUNITING: 'recruiting'
+  RECRUNITING: 'recruiting',
+  REVIEW: 'review'
 }
 
 const Popup = () => {
@@ -30,6 +32,9 @@ const Popup = () => {
                 }} />
                 <Button value='Recruiting' handleClick={() => {
                   setPageState(PAGESTATE.RECRUNITING)
+                }} />
+                <Button value='Review' handleClick={() => {
+                  setPageState(PAGESTATE.REVIEW)
                 }} />
               </div>
             </div>
@@ -90,6 +95,17 @@ const Popup = () => {
               <li>Recruiting</li>
             </ul>
             <Recruiting />
+          </>
+        )
+      }
+      {
+        pageState === PAGESTATE.REVIEW && (
+          <>
+            <ul className="breadcrumb">
+              <li className='clickable'><div onClick={() => setPageState(PAGESTATE.DASHBOARD)}>SOW plugin</div></li>
+              <li>Review</li>
+            </ul>
+            <Review />
           </>
         )
       }

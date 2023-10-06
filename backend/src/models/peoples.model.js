@@ -17,6 +17,22 @@ const getPeoples = async () => {
   }
 };
 
+const getMatched = async () => {
+  const sql = `SELECT * FROM ${Tables.tb_peoples} WHERE matched = 1`;
+  try {
+    const result = await DBConnection.query(sql);
+    return {
+      state: true,
+      items: result,
+    };
+  } catch (e) {
+    console.log(e);
+    return {
+      state: false,
+    };
+  }
+};
+
 const create = async (params) => {
   const sql = `INSERT INTO ${Tables.tb_peoples}
                     (name, url, about, company, matched) VALUES (?,?,?,?,?)`;
@@ -34,4 +50,5 @@ const create = async (params) => {
 module.exports = {
   getPeoples,
   create,
+  getMatched,
 };

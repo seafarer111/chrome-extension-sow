@@ -1,8 +1,8 @@
 const express = require("express");
 const cors = require("cors");
-const { spawn } = require("child_process");
 
 const companyRouter = require("./routes/company.route");
+const peoplesRouter = require("./routes/peoples.route");
 const cron = require("node-cron");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -31,7 +31,7 @@ app.get("/hello", (req, res) => {
 });
 // app.use("/api/auth", authRouter);
 app.use("/company", companyRouter);
-// app.use("/statistics", statisticsRouter);
+app.use("/peoples", peoplesRouter);
 
 app.all("*", (req, res, next) => {
   const error = new HttpException(404, "Endpoint Not Found.");
