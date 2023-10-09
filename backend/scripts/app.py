@@ -8,7 +8,10 @@ from time import sleep
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
-user_profile_directory = "C:\\Users\\Himanshu\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 1"
+import sys
+import json
+
+user_profile_directory = "C:\\Users\\topcoder\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 2"
 
 # Create ChromeOptions and set the user profile directory
 chrome_options = Options()
@@ -37,7 +40,10 @@ search_input = driver.find_element(By.XPATH, "//input[@placeholder='Search']")
 search_input.send_keys("gateway-company-ict")
 search_input.send_keys(Keys.RETURN)
 sleep(3)
-com='gateway-company-ict'
+
+# Parse the JSON data
+json_data = json.loads(sys.stdin.read())
+com = json_data['name']
 
 # Navigate to the Microsoft company page
 microsoft_link = f"https://www.linkedin.com/company/{com}/"
@@ -47,13 +53,23 @@ emp=driver.find_element(By.XPATH,"//a[contains(@id, 'ember') and contains(@class
 # Continue with any actions you want to perform on the Microsoft company page
 emp.click()
 sleep(5)
+current_url = driver.current_url
 func(driver,com)
-
+driver.get(current_url)
+sleep(5)
+current_url=driver.current_url
+driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+sleep(5)
 next_button = driver.find_element(By.XPATH, "//button[@aria-label='Next']")
 while next_button:
     next_button.click()
+    sleep(2)
+    current_url=[driver.current_url]
     sleep(5)
     func(driver,com)
+    driver.get(current_url[0])
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    sleep(5)
     next_button = driver.find_element(By.XPATH, "//button[@aria-label='Next']")
     
 # Find all the list items within the specified class
@@ -75,7 +91,6 @@ while next_button:
 #     print("Job Title:", job_title)
 #     print("Location:", location)
 #     print("\n")
-
 # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 # sleep(5)  # You can adjust the sleep duration as needed
 

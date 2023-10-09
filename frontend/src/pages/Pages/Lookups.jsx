@@ -4,6 +4,7 @@ import { InputText } from '../components/Input';
 import { getAll, GetUsersGPT } from '../api/company';
 import ListBox from '../components/ListBox';
 import Button from '../components/Button';
+import LoadingSpnner from '../components/Spinner';
 
 const Lookups = () => {
   const [companies, setCompanies] = useState([]);
@@ -22,9 +23,11 @@ const Lookups = () => {
       const res = await getAll();
       const data = res.map((item) => {
         return item?.name;
-      })
+      });
       setOptions(data);
       setCompanies(res);
+      console.log(data);
+      setSelectedCom(data[0]);
     };
     fetchCompanies();
   }, []);
@@ -47,11 +50,11 @@ const Lookups = () => {
 
   const handleSearchCompany = async () => {
     setIsLoading(true);
-    const sel = companies.filter((item) => item.name = selectedCom)
+    const sel = companies.filter((item) => (item.name = selectedCom));
     const res = await GetUsersGPT({
-      company: sel
+      company: sel[0],
     });
-    console.log(res)
+    console.log(res);
     setPersons(res);
     setSectedOne(res[0]);
     setIsLoading(false);
@@ -64,35 +67,27 @@ const Lookups = () => {
         optionSelect={(opt) => handleSelectedOption(opt)}
       />
       <Button value="Search" handleClick={handleSearchCompany}></Button>
-      {isLoading ? (
-        <div className="loading"></div>
-      ) : (
-        <>
-          <ListBox
-            data={persons}
-            selected={selecteOne}
-            handleSelect={handleSelectPerson}
-            handleCheck={handlePersonCheck}
-            checkBox={true}
-          />
-          <InputText
-            value={selecteOne.name}
-            placeholder="Name"
-            readOnly={true}
-          />
-          <InputText
-            value={selecteOne.title}
-            placeholder="Title"
-            readOnly={true}
-          />
-          <InputText
-            value={selecteOne.url}
-            placeholder="Profile Link"
-            readOnly={true}
-          />
-        </>
-      )
-      }
+      {isLoading && <LoadingSpnner />}
+      <>
+        <ListBox
+          data={persons}
+          selected={selecteOne}
+          handleSelect={handleSelectPerson}
+          handleCheck={handlePersonCheck}
+          checkBox={true}
+        />
+        <InputText value={selecteOne.name} placeholder="Name" readOnly={true} />
+        <InputText
+          value={selecteOne.title}
+          placeholder="Title"
+          readOnly={true}
+        />
+        <InputText
+          value={selecteOne.url}
+          placeholder="Profile Link"
+          readOnly={true}
+        />
+      </>
     </div>
   );
 };

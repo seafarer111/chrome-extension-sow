@@ -6,6 +6,7 @@ import { BufferMemory } from "langchain/memory";
 import { LLMChain } from "langchain/chains";
 import { PromptTemplate } from "langchain/prompts";
 import { spawn } from "child_process";
+const puppeteer = require("puppeteer");
 
 const template = `The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know. The AI answers as Yoda.
   Current conversation:
@@ -46,8 +47,12 @@ const createCompany = async (req, res, next) => {
 };
 
 const callPythonScriptasync = async (jsonInput) => {
+  await puppeteer.launch({ headless: false });
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn("python", ["scripts/app.py", jsonInput]);
+    const pythonProcess = spawn("python", ["scripts/app.py"]);
+    // Send the JSON data to the Python script
+    pythonProcess.stdin.write(JSON.stringify(jsonInput));
+    pythonProcess.stdin.end();
     pythonProcess.stdout.on("data", (data) => {
       const output = data.toString();
       resolve(output);
@@ -62,7 +67,7 @@ const callPythonScriptasync = async (jsonInput) => {
 
 const getGPT = async (req, res, next) => {
   const { company } = req.body;
-
+  // const scrapData = callPythonScriptasync(company);
   const scrapRes = [
     {
       name: "xxx",
