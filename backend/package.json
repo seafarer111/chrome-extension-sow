@@ -33,12 +33,15 @@
     "google-auth-library": "^7.3.0",
     "jsonwebtoken": "^8.5.1",
     "langchain": "^0.0.157",
+    "multer": "^1.4.5-lts.1",
     "mysql-migrations": "^1.0.7",
     "mysql2": "^2.2.5",
     "node-cron": "^3.0.2",
     "openai": "^4.11.0",
     "puppeteer": "^21.3.8",
-    "sequelize": "^6.6.4"
+    "sequelize": "^6.6.4",
+    "simple-resume-parser": "^1.1.8",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "eslint": "^7.29.0",

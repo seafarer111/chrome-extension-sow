@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import re
+import json
 
 def func1(html_code):
     extracted_data = []
@@ -13,18 +14,26 @@ def func1(html_code):
     ul_element = soup.find('ul', class_='pvs-list')
     div_element = soup.find('div', class_='display-flex align-items-center mr1 hoverable-link-text t-bold')
     company_name_element = div_element.find('span', {'aria-hidden': 'true'}).text
-    div_ele1=div_element.find_next('div', class_='display-flex align-items-center mr1 hoverable-link-text t-bold')
-    position=div_ele1.find('span', {'aria-hidden': 'true'}).text
-    time=soup.find('span',class_="t-14 t-normal")
+    div_ele1 = div_element.find_next('div', class_='display-flex align-items-center mr1 hoverable-link-text t-bold')
+    position = div_ele1.find('span', {'aria-hidden': 'true'}).text
+    time = soup.find('span', class_="t-14 t-normal")
     time = soup.find('span', class_="t-14 t-normal")
     if time:
-        time=time.contents[0].strip()
+        time = time.contents[0].strip()
     else:
-        time=''
+        time = ''
     experience_text = f"Company: {works_at}\nPosition: {position}\nTime: {time}\n"
-    formatted_data = f"Name: {name}\nCurrent Job: {works_at}\nLocation: {location_loc.strip()}\n"
-    formatted_data += (experience_text)+"\n" 
+    formatted_data = {
+        "Name": name,
+        "Current Job": works_at,
+        "Location": location_loc.strip(),
+        "Experience": {
+            "Company": works_at,
+            "Position": position,
+            "Time": time
+        },
+        "About":""
+    }
+    return formatted_data
+    # Append the data to the JSON file
 
-    # Write the data to the specified file
-    with open("data.txt", 'a', encoding='utf-8') as file:
-        file.write(formatted_data)

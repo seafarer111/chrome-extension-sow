@@ -8,10 +8,7 @@ from time import sleep
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
-import sys
-import json
-
-user_profile_directory = "C:\\Users\\topcoder\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 2"
+user_profile_directory = "C:\\Users\\Himanshu\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 1"
 
 # Create ChromeOptions and set the user profile directory
 chrome_options = Options()
@@ -40,10 +37,7 @@ search_input = driver.find_element(By.XPATH, "//input[@placeholder='Search']")
 search_input.send_keys("gateway-company-ict")
 search_input.send_keys(Keys.RETURN)
 sleep(3)
-
-# Parse the JSON data
-json_data = json.loads(sys.stdin.read())
-com = json_data['name']
+com='microsoft'
 
 # Navigate to the Microsoft company page
 microsoft_link = f"https://www.linkedin.com/company/{com}/"

@@ -9,4 +9,6 @@ router.post("/", awaitHandlerFactory(companyController.createCompany));
 
 router.post("/gpt", awaitHandlerFactory(companyController.getGPT));
 
+router.post("/resume", awaitHandlerFactory(companyController.uploadResume));
+
 module.exports = router;
