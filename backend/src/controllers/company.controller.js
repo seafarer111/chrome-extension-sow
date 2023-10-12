@@ -64,28 +64,47 @@ const createCompany = async (req, res, next) => {
 
 const uploadResume = async (req, res, next) => {
   upload(req, res, () => {
-    const jobUrl = req.body.joblink;
-    const icp = req.body.icp;
-    console.log(icp);
+    const { jobDesc, icp, company } = req.body;
+    console.log(jobDesc, icp);
     /** Here we should scrap the job description from the job link */
-    const jobDescirption =
-      "Hi everyone! We're working on a platform that aims to connect startup founders and top-level IT talents: developers, designers, product managers, etc. Today we've launched on Product Hunt and would appreciate your feedback!";
     const resume = new ResumeParser(req.file.path);
     resume
       .parseToJSON()
       .then(async (data) => {
         const experience = data.parts?.experience ? data.parts.experience : "";
         const skills = data.parts?.skills ? data.parts.skills : "";
+        const name = data.parts?.name ? data.parts.name : "";
+        const linkedinUrl = data.parts?.profiles
+          ? data.parts.profiles
+              .split(" ")
+              .filter((item) => item.includes("linkedin.com"))[0]
+          : "";
+        const about = "";
         const resumeData = {
           experience,
           skills,
         };
-        const prompt = `You are the hiring manager for Our company which does ${icp}. We have a job opening listed at ${jobDescirption}. Take a look at ${JSON.stringify(
+        const prompt = `You are the hiring manager for Our company which does ${icp}. We have a job opening listed at ${jobDesc}. Take a look at ${JSON.stringify(
           resumeData
-        )} and tell me the pros and cons of this person in this roll.`;
-        const results = await chain.call({ input: prompt });
-        console.log(results);
-        res.send({ ok: true, data: results });
+        )} and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.`;
+        try {
+          const results = await chain.call({ input: prompt });
+          const savedata = {
+            name: name,
+            url: linkedinUrl,
+            about: about,
+            company: company,
+            matched: true,
+          };
+          const result = PeoplesModel.create(savedata);
+          if (!result) {
+            res.send({ ok: false, data: "Something went wrong." });
+          } else {
+            res.send({ ok: true, data: results });
+          }
+        } catch (error) {
+          res.send({ ok: false, data: error });
+        }
       })
       .catch((error) => {
         res.send({ ok: false, data: "Something went wrong." });
@@ -94,103 +113,51 @@ const uploadResume = async (req, res, next) => {
   });
 };
 
-const callPythonScriptasync = async (jsonInput) => {
+const callPythonScriptasync = async (input) => {
   await puppeteer.launch({ headless: false });
   return new Promise((resolve, reject) => {
     const pythonProcess = spawn("python", ["scripts/app.py"]);
-    // Send the JSON data to the Python script
-    pythonProcess.stdin.write(JSON.stringify(jsonInput));
+    pythonProcess.stdin.write(input);
     pythonProcess.stdin.end();
+    let output = "";
     pythonProcess.stdout.on("data", (data) => {
-      const output = data.toString();
-      resolve(output);
+      output = data.toString();
     });
     let errorOutput = "";
     pythonProcess.stderr.on("data", (data) => {
       errorOutput += data.toString();
-      reject(errorOutput);
+    });
+
+    // Listen for process exit
+    pythonProcess.on("exit", (code) => {
+      if (code === 0) {
+        const jsonOutput = JSON.parse(output);
+        console.log(jsonOutput);
+        resolve(output);
+      } else {
+        reject(errorOutput);
+      }
     });
   });
 };
 
 const getGPT = async (req, res, next) => {
   const { company } = req.body;
-  // const scrapData = callPythonScriptasync(company);
-  const scrapRes = [
-    {
-      name: "xxx",
-      about: "Actively Looking for Change as a front end Developer with 2+ EXP",
-      company: "Hyderabad",
-      url: "345634563456",
-    },
-    {
-      name: "yyy",
-      about: "Bench sales recruiter At Spherestaffit",
-      company: "Hyderabad",
-      url: "34563456",
-    },
-    {
-      name: "zzz",
-      about:
-        "HR Operations Executive || Actively hiring for HR Generalist and US IT Bench Sales Recruiter roles in Rajahmundry, AP || Email me at hr.admin.bza@prodisystech.com",
-      company: "Vijayawada",
-      url: "3563",
-    },
-    {
-      name: "aaaa",
-      about: "Software Test Engineer at Prodisys Technologies",
-      company: "Krishna",
-      url: "",
-    },
-    {
-      name: "bbb",
-      about: "Actively Hiring BDMs - US IT & Non-IT Sales",
-      company: "Hyderabad",
-      url: "",
-    },
-    {
-      name: "cccc",
-      about: "Quality Analyst at Prodisys Technologies",
-      company: "Hyderabad",
-      url: "",
-    },
-    {
-      name: "dddd",
-      about: "Human Resources",
-      company: "Hyderabad",
-      url: "",
-    },
-    {
-      name: "eeeee",
-      about: "Technical Associate at Prodisys Technologies",
-      company: "Hyderabad",
-      url: "",
-    },
-    {
-      name: "dddddeee",
-      about: "HR Executive",
-      company: "Andhra Pradesh",
-      url: "India",
-    },
-    {
-      name: "LinkedIn Member",
-      url: "afdafda",
-      about: "IT Recruiter at prodisys",
-      company: "Krishna",
-    },
-  ];
+  const scrapData = await callPythonScriptasync(company.name);
   ICP = company.icp;
   ABOUT = company.about;
   COMPANY = company.name;
-  const results = await Promise.all(scrapRes.map(langChainFunc));
-
-  // PeoplesModel.create(results);
+  const results = await Promise.all(scrapData.map(langChainFunc));
+  const result = PeoplesModel.create(results);
+  if (!result) {
+    throw new HttpException(500, "Something went wrong");
+  }
   res.send({ ok: true, data: results });
 };
 
 const langChainFunc = async (item, idx) => {
   const prompt = `Please provide only "true" or "false" if the this member(${item.about}) is matched with the company(${ICP}, also ${ABOUT}), Don't answer if the response is ture or false!!!`;
-  const res = await chain.call({ input: prompt }); // TRUE or FALSE
+  const res = await chain.call({ input: prompt });
   return {
     id: idx,
     name: item.name,

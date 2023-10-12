@@ -23,7 +23,11 @@ const Review = () => {
   }, [])
 
   const handleLinkedNavigate = () => {
-    console.log(selectedOne)
+    if (selectedOne.url) {
+      
+    } else {
+      alert('Linkedin Profile was not provided.')
+    }
   }
 
   return (

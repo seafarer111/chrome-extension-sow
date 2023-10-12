@@ -13,7 +13,7 @@ export default function MyCombobox(props) {
         defaultIndex={0}
         optionsListMaxHeight={300}
         style={{
-          width: "280px",
+          width: "298px",
           margin: "0 auto",
         }}
         focusColor="#20C374"

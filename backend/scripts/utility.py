@@ -53,7 +53,7 @@ def func(driver, com):
         with open('linkedin_data.json', 'a', encoding='utf-8') as json_file:
             for about_xpath in about_xpaths:
                 try:
-                    about = driver.find_element(By.XPATH, about_xpath)
+                    about = driver.find_element(By.XPATH, about_xpath).text
                 except NoSuchElementException:
                     about=''
 

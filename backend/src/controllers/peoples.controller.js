@@ -20,8 +20,8 @@ const getMatched = async (req, res, next) => {
 };
 
 const createPeople = async (req, res, next) => {
-  const company = req.body;
-  const result = PeoplesModel.create(company);
+  const people = req.body;
+  const result = PeoplesModel.create(people);
   if (!result) {
     throw new HttpException(500, "Something went wrong");
   }

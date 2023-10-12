@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { InputText } from '../components/Input';
-import MyCombobox from '../components/Combobox'
+import { InputText, MyTextArea } from '../components/Input';
+import MyCombobox from '../components/Combobox';
 import axios from 'axios';
 import siteConfig from '../config/site.config';
 import { useEffect } from 'react';
@@ -8,7 +8,8 @@ import LoadingSpnner from '../components/Spinner';
 import { useRef } from 'react';
 
 const Recruiting = () => {
-  const [jobLink, setJobLink] = useState('');
+  const [jobDesc, setJobDesc] = useState('');
+  const [profileLink, setProfileLink] = useState('');
   const [type, setType] = useState('resume');
   const [resume, setResume] = useState(null);
   const [options, setOptions] = useState([]);
@@ -31,7 +32,7 @@ const Recruiting = () => {
     const reader = new FileReader();
     const file = e.target.files[0];
     reader.onloadend = () => {
-      setResume(file)
+      setResume(file);
     };
     if (e.target.files[0]) {
       reader.readAsDataURL(file);
@@ -42,26 +43,41 @@ const Recruiting = () => {
     e.preventDefault();
     e.target.reset();
     resultRef.current.innerHTML = '';
-    if (jobLink) {
+    if (jobDesc) {
       const formData = new FormData();
-      formData.append('joblink', jobLink);
+      formData.append('jobDesc', jobDesc);
+      formData.append('company', selectedCom.name);
       formData.append('icp', selectedCom.icp);
       formData.append('resume', resume);
       const config = {
-          headers: {
-              'content-type': 'multipart/form-data'
-          }
+        headers: {
+          'content-type': 'multipart/form-data',
+        },
       };
-      const url = `${siteConfig.apiUrl}/company/resume`
+      const url = `${siteConfig.apiUrl}/company/resume`;
       setIsLoading(true);
-      axios.post(url, formData, config).then(res => {
-        resultRef.current.innerHTML = res.data.data.text.replace(/\r?\n|\r/g, '<br />');
-        setIsLoading(false);
-      }).catch(e => {
-        setIsLoading(false);
-      })
+      axios
+        .post(url, formData, config)
+        .then((res) => {
+          if (res.data.ok) {
+            resultRef.current.innerHTML = res.data.data.text.replace(
+              /\r?\n|\r/g,
+              '<br />'
+            );
+          } else {
+            resultRef.current.innerHTML = res.data.data.replace(
+              /\r?\n|\r/g,
+              '<br />'
+            );
+          }
+
+          setIsLoading(false);
+        })
+        .catch((e) => {
+          setIsLoading(false);
+        });
     } else {
-      alert('Job Description can not be emplty.')
+      alert('Job Description can not be emplty.');
     }
   };
 
@@ -71,28 +87,32 @@ const Recruiting = () => {
       setCompanies(res.data.data);
       const coms = res.data.data.map((com) => {
         return com.name;
-      })
+      });
       setOptions(coms);
       setSelectedCom(res.data.data[0]);
-    }
+    };
     fetchCompanies();
-  }, [])
+  }, []);
 
   const handleOptionSelect = (com) => {
-    const scom = companies.filter((company) => company.name === com)
+    const scom = companies.filter((company) => company.name === com);
     setSelectedCom(scom[0]);
-  }
+  };
+
+  const handleDescriptionChange = (value) => {
+    setJobDesc(value);
+  };
+
+  const handleSubmitProfile = (e) => {};
 
   return (
     <div className="main-container">
       {isLoading && <LoadingSpnner />}
       <MyCombobox options={options} optionSelect={handleOptionSelect} />
-      <InputText
-        placeholder="Job Description Link"
-        value={jobLink}
-        handleChange={(value) => {
-          setJobLink(value);
-        }}
+      <MyTextArea
+        value={jobDesc}
+        handleChange={handleDescriptionChange}
+        placeholder="Job Description"
       />
       <div className="plans">
         <div className="d-flex space-between">
@@ -169,7 +189,8 @@ const Recruiting = () => {
                     <p>
                       <span>Size : {filesizes(resume.size)}</span>
                       <span className="ml-2">
-                        Modified Time : {resume.lastModifiedDate.toLocaleString('en-IN')}
+                        Modified Time :{' '}
+                        {resume.lastModifiedDate.toLocaleString('en-IN')}
                       </span>
                     </p>
                   </div>
@@ -177,23 +198,34 @@ const Recruiting = () => {
               )}
             </div>
             <div className="kb-buttons-box">
-              {resume && <button type="submit" className="button button-1">
-                Upload
-              </button>}
+              {resume && (
+                <button type="submit" className="button button-1">
+                  Upload
+                </button>
+              )}
             </div>
           </form>
         </div>
       )}
       {type === 'profile' && (
-        <InputText
-          placeholder="Linkedin Profile Link"
-          value={jobLink}
-          handleChange={(value) => {
-            setJobLink(value);
-          }}
-        />
+        <>
+          <InputText
+            placeholder="Linkedin Profile Link"
+            value={profileLink}
+            handleChange={(value) => {
+              setProfileLink(value);
+            }}
+          />
+          <div className="kb-buttons-box">
+            <button onClick={handleSubmitProfile} className="button button-1">
+              Ok
+            </button>
+          </div>
+        </>
       )}
-      <div style={{ textAlign: 'justify'}}><span ref={resultRef}></span></div>
+      <div style={{ textAlign: 'justify' }}>
+        <span ref={resultRef}></span>
+      </div>
     </div>
   );
 };
