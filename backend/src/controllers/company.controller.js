@@ -128,7 +128,6 @@ const callPythonScriptasync = async (input) => {
       errorOutput += data.toString();
     });
 
-    // Listen for process exit
     pythonProcess.on("exit", (code) => {
       if (code === 0) {
         const jsonOutput = JSON.parse(output);
