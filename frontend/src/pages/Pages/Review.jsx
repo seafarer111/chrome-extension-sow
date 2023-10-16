@@ -3,7 +3,6 @@ import ListBox from '../components/ListBox';
 import axios from 'axios';
 import siteConfig from '../config/site.config';
 import Button from '../components/Button';
-import qs from 'querystring'
 
 const Review = () => {
   const [data, setData] = useState([]);
@@ -28,7 +27,6 @@ const Review = () => {
       const res = await axios.post(`${siteConfig.apiUrl}/peoples/salesnavigator`, {
         data: selectedOne
       })
-
       if (res.data.ok) {
         alert('Linkedin Profile was successfully added to sales navigator.')
       } else {
