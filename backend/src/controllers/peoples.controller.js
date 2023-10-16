@@ -1,5 +1,7 @@
 const PeoplesModel = require("../models/peoples.model");
 const HttpException = require("../utils/HttpException.utils");
+const LinkedIn = require("node-linkedin");
+const { getLinkedinAccessToken } = require("../utils/utils");
 
 const getPeoples = async (req, res, next) => {
   const result = await PeoplesModel.getPeoples();
@@ -28,8 +30,35 @@ const createPeople = async (req, res, next) => {
   res.send({ ok: true, data: "successful" });
 };
 
+const saveSalesNavigator = async (req, res, next) => {
+  const linkedin = new LinkedIn({
+    clientId: process.env.LINKEDIN_CLIENT_ID,
+    clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+    redirectUri: process.env.LINKEDIN_CLIENT_REDIRECT_URI,
+  });
+  const accessToken = await getLinkedinAccessToken();
+  const profileUrl = req.body.url;
+  const leadType = "person";
+  const locationFilter = {
+    geoRegion: "us:0",
+  };
+  linkedin.sn.saveLead(
+    profileUrl,
+    leadType,
+    locationFilter,
+    accessToken,
+    (err, result) => {
+      if (err) {
+        throw new HttpException(500, "Something went wrong");
+      }
+      res.send({ ok: true, data: result });
+    }
+  );
+};
+
 module.exports = {
   getPeoples,
   createPeople,
   getMatched,
+  saveSalesNavigator,
 };

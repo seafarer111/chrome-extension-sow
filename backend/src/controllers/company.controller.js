@@ -6,11 +6,12 @@ import { BufferMemory } from "langchain/memory";
 import { LLMChain } from "langchain/chains";
 import { PromptTemplate } from "langchain/prompts";
 import { spawn } from "child_process";
-const puppeteer = require("puppeteer");
+import { getLinkedinAccessToken } from "../utils/utils";
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const ResumeParser = require("simple-resume-parser");
+const LinkedIn = require("node-linkedin");
 
 const storage = multer.diskStorage({
   destination: "uploads/resume",
@@ -114,7 +115,6 @@ const uploadResume = async (req, res, next) => {
 };
 
 const callPythonScriptasync = async (input) => {
-  await puppeteer.launch({ headless: false });
   return new Promise((resolve, reject) => {
     const pythonProcess = spawn("python", ["scripts/app.py"]);
     pythonProcess.stdin.write(input);
@@ -142,11 +142,37 @@ const callPythonScriptasync = async (input) => {
 
 const getGPT = async (req, res, next) => {
   const { company } = req.body;
-  const scrapData = await callPythonScriptasync(company.name);
+  const linkedin = new LinkedIn({
+    clientId: process.env.LINKEDIN_CLIENT_ID,
+    clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+    redirectUri: process.env.LINKEDIN_CLIENT_REDIRECT_URI,
+  });
+  const accessToken = await getLinkedinAccessToken();
+  const employees = await linkedin.companies_search.name(
+    company.name,
+    accessToken,
+    (err, companies) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      const companyId = companies.companies.values[0].id;
+      linkedin.companies
+        .company(companyId)
+        .fields("employees")
+        .result(accessToken, (err, company) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          return company.employees.values;
+        });
+    }
+  );
   ICP = company.icp;
   ABOUT = company.about;
   COMPANY = company.name;
-  const results = await Promise.all(scrapData.map(langChainFunc));
+  const results = await Promise.all(employees.map(langChainFunc));
   const result = PeoplesModel.create(results);
   if (!result) {
     throw new HttpException(500, "Something went wrong");
@@ -159,9 +185,9 @@ const langChainFunc = async (item, idx) => {
   const res = await chain.call({ input: prompt });
   return {
     id: idx,
-    name: item.name,
-    about: item.title,
-    url: item.url,
+    name: `${item.firstName} ${item.lastName}`,
+    about: item.headline,
+    url: item.publicProfileUrl,
     company: COMPANY,
     matched: res.text.toLowerCase().startsWith("true") ? true : false,
   };

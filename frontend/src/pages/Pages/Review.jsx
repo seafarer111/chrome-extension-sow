@@ -25,43 +25,15 @@ const Review = () => {
 
   const handleLinkedNavigate = async () => {
     if (selectedOne.url) {
-      const data = {
-        grant_type: 'client_credentials',
-        client_id: siteConfig.LINKEDIN_APP_CLIENT_ID,
-        client_secret: siteConfig.LINKEDIN_APP_CLIENT_SECRET
-      };
-      const res = await axios.post('https://www.linkedin.com/oauth/v2/accessToken', qs.stringify(data), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
+      const res = await axios.post(`${siteConfig.apiUrl}/peoples/salesnavigator`, {
+        data: selectedOne
       })
-      console.log(res, selectedOne)
-      const accessToken = res.data.access_token;
-      const profileId = selectedOne.url.split('/').pop();
 
-      fetch(`https://api.linkedin.com/v2/salesPreferences/people/${profileId}/savedItems`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'PROFILE',
-          profile: {
-            id: profileId,
-          },
-        }),
-      })
-        .then(response => {
-          if (response.ok) {
-            alert('Profile saved successfully!');
-          } else {
-            alert('Failed to save profile:', response.status);
-          }
-        })
-        .catch(error => {
-          alert('Error saving profile:', error);
-        });
+      if (res.data.ok) {
+        alert('Linkedin Profile was successfully added to sales navigator.')
+      } else {
+        alert('Something went wrong.')
+      }
     } else {
       alert('Linkedin Profile was not provided.')
     }
