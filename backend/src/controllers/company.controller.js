@@ -11,7 +11,11 @@ const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const ResumeParser = require("simple-resume-parser");
-const LinkedIn = require("node-linkedin");
+const LinkedIn = require("node-linkedin")(
+  process.env.LINKEDIN_CLIENT_ID,
+  process.env.LINKEDIN_CLIENT_SECRET,
+  process.env.LINKEDIN_CLIENT_REDIRECT_URI
+);
 
 const storage = multer.diskStorage({
   destination: "uploads/resume",
@@ -142,12 +146,9 @@ const callPythonScriptasync = async (input) => {
 
 const getGPT = async (req, res, next) => {
   const { company } = req.body;
-  const linkedin = new LinkedIn({
-    clientId: process.env.LINKEDIN_CLIENT_ID,
-    clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
-    redirectUri: process.env.LINKEDIN_CLIENT_REDIRECT_URI,
-  });
   const accessToken = await getLinkedinAccessToken();
+  const linkedin = LinkedIn.init(accessToken);
+  console.log("accessToken", accessToken);
   const employees = await linkedin.companies_search.name(
     company.name,
     accessToken,
