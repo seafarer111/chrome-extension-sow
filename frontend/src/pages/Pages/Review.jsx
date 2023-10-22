@@ -16,8 +16,12 @@ const Review = () => {
   useEffect(() => {
     const fetchData = async () => {
       const res = await axios.get(`${siteConfig.apiUrl}/peoples/matched`)
-      setData(res.data.items)
-      setSelectedOne(res.data.items[0])
+      if (res.data.ok) {
+        setData(res.data.items)
+        setSelectedOne(res.data.items[0])
+      } else {
+        alert(res.data.data)
+      }
     }
     fetchData();
   }, [])
@@ -30,7 +34,7 @@ const Review = () => {
       if (res.data.ok) {
         alert('Linkedin Profile was successfully added to sales navigator.')
       } else {
-        alert('Something went wrong.')
+        alert(res.data.data)
       }
     } else {
       alert('Linkedin Profile was not provided.')

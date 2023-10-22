@@ -48,7 +48,7 @@ const getCompanies = async (req, res, next) => {
   if (result) {
     res.send({ ok: true, data: result.items });
   } else {
-    throw new HttpException(404, "Something went wrong");
+    res.send({ ok: false, data: "Somethign went wrong." });
   }
 };
 
@@ -146,39 +146,42 @@ const callPythonScriptasync = async (input) => {
 
 const getGPT = async (req, res, next) => {
   const { company } = req.body;
-  const accessToken = await getLinkedinAccessToken();
-  const linkedin = LinkedIn.init(accessToken);
-  console.log("accessToken", accessToken);
-  const employees = await linkedin.companies_search.name(
-    company.name,
-    accessToken,
-    (err, companies) => {
-      if (err) {
-        console.error(err);
-        return;
+  try {
+    const accessToken = await getLinkedinAccessToken();
+    const linkedin = LinkedIn.init(accessToken);
+    const employees = await linkedin.companies_search.name(
+      company.name,
+      accessToken,
+      (err, companies) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        const companyId = companies.companies.values[0].id;
+        linkedin.companies
+          .company(companyId)
+          .fields("employees")
+          .result(accessToken, (err, company) => {
+            if (err) {
+              console.error(err);
+              return;
+            }
+            return company.employees.values;
+          });
       }
-      const companyId = companies.companies.values[0].id;
-      linkedin.companies
-        .company(companyId)
-        .fields("employees")
-        .result(accessToken, (err, company) => {
-          if (err) {
-            console.error(err);
-            return;
-          }
-          return company.employees.values;
-        });
+    );
+    ICP = company.icp;
+    ABOUT = company.about;
+    COMPANY = company.name;
+    const results = await Promise.all(employees.map(langChainFunc));
+    const result = PeoplesModel.create(results);
+    if (!result) {
+      res.send({ ok: false, data: "Something went wrong" });
     }
-  );
-  ICP = company.icp;
-  ABOUT = company.about;
-  COMPANY = company.name;
-  const results = await Promise.all(employees.map(langChainFunc));
-  const result = PeoplesModel.create(results);
-  if (!result) {
-    throw new HttpException(500, "Something went wrong");
+    res.send({ ok: true, data: results });
+  } catch (error) {
+    res.send({ ok: false, data: "Something went wrong" });
   }
-  res.send({ ok: true, data: results });
 };
 
 const langChainFunc = async (item, idx) => {

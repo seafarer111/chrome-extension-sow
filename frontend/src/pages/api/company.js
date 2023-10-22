@@ -57,6 +57,7 @@ async function getAll() {
 async function GetUsersGPT(data) {
   try {
     const users = await apiPost(`/company/gpt`, data);
+    console.log(users);
     return Promise.resolve(users);
   } catch (error) {
     return Promise.reject(error);

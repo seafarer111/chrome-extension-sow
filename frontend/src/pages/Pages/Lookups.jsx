@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import MyCombobox from '../components/Combobox';
 import { InputText } from '../components/Input';
-import { getAll, GetUsersGPT } from '../api/company';
+import { getAll } from '../api/company';
 import ListBox from '../components/ListBox';
 import Button from '../components/Button';
 import LoadingSpnner from '../components/Spinner';
+import axios from 'axios';
+import siteConfig from '../config/site.config';
 
 const Lookups = () => {
   const [companies, setCompanies] = useState([]);
@@ -20,14 +22,14 @@ const Lookups = () => {
 
   useEffect(() => {
     const fetchCompanies = async () => {
-      const res = await getAll();
-      const data = res.map((item) => {
-        return item?.name;
-      });
-      setOptions(data);
-      setCompanies(res);
-      console.log(data);
-      setSelectedCom(data[0]);
+      const res = await axios.get(`${siteConfig.apiUrl}/company/all`);
+      console.log(res)
+      // const data = res.map((item) => {
+      //   return item?.name;
+      // });
+      // setOptions(data);
+      // setCompanies(res);
+      // setSelectedCom(data[0]);
     };
     fetchCompanies();
   }, []);
@@ -51,12 +53,13 @@ const Lookups = () => {
   const handleSearchCompany = async () => {
     setIsLoading(true);
     const sel = companies.filter((item) => (item.name = selectedCom));
-    const res = await GetUsersGPT({
-      company: sel[0],
-    });
-    console.log(res);
-    setPersons(res);
-    setSectedOne(res[0]);
+    const res = await axios.post(`${siteConfig.apiUrl}/company/gpt`, sel[0]);
+    if (res.data.ok) {
+      setPersons(res.data.data);
+      setSectedOne(res.data.data[0] );
+    } else {
+      alert(res.data.data + ' with Linkedin API.')
+    }
     setIsLoading(false);
   };
 
