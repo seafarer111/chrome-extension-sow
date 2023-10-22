@@ -147,29 +147,30 @@ const callPythonScriptasync = async (input) => {
 const getGPT = async (req, res, next) => {
   const { company } = req.body;
   try {
-    const accessToken = await getLinkedinAccessToken();
-    const linkedin = LinkedIn.init(accessToken);
-    const employees = await linkedin.companies_search.name(
-      company.name,
-      accessToken,
-      (err, companies) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        const companyId = companies.companies.values[0].id;
-        linkedin.companies
-          .company(companyId)
-          .fields("employees")
-          .result(accessToken, (err, company) => {
-            if (err) {
-              console.error(err);
-              return;
-            }
-            return company.employees.values;
-          });
-      }
-    );
+    await callPythonScriptasync(company.name);
+    // const accessToken = await getLinkedinAccessToken();
+    // const linkedin = LinkedIn.init(accessToken);
+    // const employees = await linkedin.companies_search.name(
+    //   company.name,
+    //   accessToken,
+    //   (err, companies) => {
+    //     if (err) {
+    //       console.error(err);
+    //       return;
+    //     }
+    //     const companyId = companies.companies.values[0].id;
+    //     linkedin.companies
+    //       .company(companyId)
+    //       .fields("employees")
+    //       .result(accessToken, (err, company) => {
+    //         if (err) {
+    //           console.error(err);
+    //           return;
+    //         }
+    //         return company.employees.values;
+    //       });
+    //   }
+    // );
     ICP = company.icp;
     ABOUT = company.about;
     COMPANY = company.name;
