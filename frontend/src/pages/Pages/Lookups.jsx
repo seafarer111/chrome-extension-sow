@@ -23,13 +23,16 @@ const Lookups = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       const res = await axios.get(`${siteConfig.apiUrl}/company/all`);
-      console.log(res)
-      // const data = res.map((item) => {
-      //   return item?.name;
-      // });
-      // setOptions(data);
-      // setCompanies(res);
-      // setSelectedCom(data[0]);
+      if (res.data.ok) {
+        const data = res.data.data.map((item) => {
+          return item?.name;
+        });
+        setOptions(data);
+        setCompanies(res.data.data);
+        setSelectedCom(data[0]);
+      } else {
+        alert('Something went wrong.')
+      }
     };
     fetchCompanies();
   }, []);
@@ -53,13 +56,14 @@ const Lookups = () => {
   const handleSearchCompany = async () => {
     setIsLoading(true);
     const sel = companies.filter((item) => (item.name = selectedCom));
+    console.log(sel[0])
     const res = await axios.post(`${siteConfig.apiUrl}/company/gpt`, sel[0]);
-    if (res.data.ok) {
-      setPersons(res.data.data);
-      setSectedOne(res.data.data[0] );
-    } else {
-      alert(res.data.data + ' with Linkedin API.')
-    }
+    // if (res.data.ok) {
+    //   setPersons(res.data.data);
+    //   setSectedOne(res.data.data[0]);
+    // } else {
+    //   alert(res.data.data + ' with Linkedin API.')
+    // }
     setIsLoading(false);
   };
 

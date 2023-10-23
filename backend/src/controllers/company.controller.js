@@ -6,7 +6,7 @@ import { BufferMemory } from "langchain/memory";
 import { LLMChain } from "langchain/chains";
 import { PromptTemplate } from "langchain/prompts";
 import { spawn } from "child_process";
-import { getLinkedinAccessToken } from "../utils/utils";
+// import { getLinkedinAccessToken } from "../utils/utils";
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
@@ -145,13 +145,16 @@ const callPythonScriptasync = async (input) => {
 };
 
 const getGPT = async (req, res, next) => {
-  const { company } = req.body;
+  const { name, url, about, icp } = req.body;
+
   try {
-    await callPythonScriptasync(company.name);
+    console.log(name);
+    const employees = await callPythonScriptasync(name);
+    console.log(employees);
     // const accessToken = await getLinkedinAccessToken();
     // const linkedin = LinkedIn.init(accessToken);
     // const employees = await linkedin.companies_search.name(
-    //   company.name,
+    //   name,
     //   accessToken,
     //   (err, companies) => {
     //     if (err) {
@@ -171,6 +174,12 @@ const getGPT = async (req, res, next) => {
     //       });
     //   }
     // );
+    const company = {
+      name,
+      url,
+      about,
+      icp,
+    };
     ICP = company.icp;
     ABOUT = company.about;
     COMPANY = company.name;
