@@ -146,48 +146,62 @@ const callPythonScriptasync = async (input) => {
 
 const getGPT = async (req, res, next) => {
   const { name, url, about, icp } = req.body;
-
+  const employees = [
+    {
+      name: "Sam Crisco",
+      url: "linkedin.com/in/afdafdafda",
+      about:
+        "and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.",
+      company: "pizap",
+    },
+  ];
   try {
-    console.log(name);
-    const employees = await callPythonScriptasync(name);
-    console.log(employees);
-    // const accessToken = await getLinkedinAccessToken();
-    // const linkedin = LinkedIn.init(accessToken);
-    // const employees = await linkedin.companies_search.name(
-    //   name,
-    //   accessToken,
-    //   (err, companies) => {
-    //     if (err) {
-    //       console.error(err);
-    //       return;
-    //     }
-    //     const companyId = companies.companies.values[0].id;
-    //     linkedin.companies
-    //       .company(companyId)
-    //       .fields("employees")
-    //       .result(accessToken, (err, company) => {
-    //         if (err) {
-    //           console.error(err);
-    //           return;
-    //         }
-    //         return company.employees.values;
-    //       });
-    //   }
-    // );
+    const accessToken = await getLinkedinAccessToken();
+    const linkedin = LinkedIn.init(accessToken);
+    const employees = await linkedin.companies_search.name(
+      name,
+      accessToken,
+      (err, companies) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        const companyId = companies.companies.values[0].id;
+        linkedin.companies
+          .company(companyId)
+          .fields("employees")
+          .result(accessToken, (err, company) => {
+            if (err) {
+              console.error(err);
+              return;
+            }
+            return company.employees.values;
+          });
+      }
+    );
     const company = {
       name,
       url,
       about,
       icp,
     };
+
     ICP = company.icp;
     ABOUT = company.about;
     COMPANY = company.name;
-    const results = await Promise.all(employees.map(langChainFunc));
-    const result = PeoplesModel.create(results);
-    if (!result) {
-      res.send({ ok: false, data: "Something went wrong" });
-    }
+    const results = await Promise.all(
+      employees.map((employee) => {
+        const _emp = {
+          name: `${employee.firstName} ${employee.lastName}`,
+          url: employee.publicProfileUrl,
+          about: employee.headline,
+        };
+        langChainFunc(_emp);
+      })
+    );
+    results.map(async (item) => {
+      await PeoplesModel.create(item);
+    });
     res.send({ ok: true, data: results });
   } catch (error) {
     res.send({ ok: false, data: "Something went wrong" });
@@ -195,13 +209,14 @@ const getGPT = async (req, res, next) => {
 };
 
 const langChainFunc = async (item, idx) => {
-  const prompt = `Please provide only "true" or "false" if the this member(${item.about}) is matched with the company(${ICP}, also ${ABOUT}), Don't answer if the response is ture or false!!!`;
+  const prompt = `Please provide only "true" or "false" if the this member(${item.about}) is matched with the company(${ICP}, also ${ABOUT}), Don't answer if the response is ture or false.`;
+  console.log(prompt);
   const res = await chain.call({ input: prompt });
   return {
     id: idx,
-    name: `${item.firstName} ${item.lastName}`,
-    about: item.headline,
-    url: item.publicProfileUrl,
+    name: item.name,
+    url: item.url,
+    about: item.about,
     company: COMPANY,
     matched: res.text.toLowerCase().startsWith("true") ? true : false,
   };

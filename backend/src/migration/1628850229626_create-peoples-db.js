@@ -3,9 +3,9 @@ module.exports = {
   (
     id              INT PRIMARY KEY auto_increment, 
     name            VARCHAR(255) NOT NULL, 
-    url           VARCHAR(255) NOT NULL, 
+    url           TEXT NOT NULL, 
     about        TEXT NOT NULL, 
-    company            VARCHAR(255) NOT NULL,
+    company            TEXT NOT NULL,
     matched            BOOLEAN NOT NULL,
     created_on      DATETIME NOT NULL DEFAULT NOW(),
     updated_on      DATETIME NOT NULL DEFAULT NOW(),

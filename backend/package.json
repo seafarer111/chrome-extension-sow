@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "babel-node src/app.js",
     "dev": "nodemon --exec babel-node src/app.js",
-    "migrate": "node migration.js up"
+    "migrate": "node create-db.js up && node migration.js up"
   },
   "keywords": [
     "node",

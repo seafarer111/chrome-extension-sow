@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import MyCombobox from '../components/Combobox';
-import { InputText } from '../components/Input';
+import { InputText, MyTextArea } from '../components/Input';
 import { getAll } from '../api/company';
 import ListBox from '../components/ListBox';
 import Button from '../components/Button';
@@ -55,9 +55,11 @@ const Lookups = () => {
 
   const handleSearchCompany = async () => {
     setIsLoading(true);
-    const sel = companies.filter((item) => (item.name = selectedCom));
-    console.log(sel[0])
-    const res = await axios.post(`${siteConfig.apiUrl}/company/gpt`, sel[0]);
+    console.log(companies)
+    const com = companies.filter((item) =>
+      item.name === selectedCom
+    );
+    const res = await axios.post(`${siteConfig.apiUrl}/company/gpt`, com[0]);
     if (res.data.ok) {
       setPersons(res.data.data);
       setSectedOne(res.data.data[0]);
@@ -84,8 +86,8 @@ const Lookups = () => {
           checkBox={true}
         />
         <InputText value={selecteOne.name} placeholder="Name" readOnly={true} />
-        <InputText
-          value={selecteOne.title}
+        <MyTextArea
+          value={selecteOne.about}
           placeholder="Title"
           readOnly={true}
         />
