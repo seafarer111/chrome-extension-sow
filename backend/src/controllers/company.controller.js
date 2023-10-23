@@ -146,15 +146,15 @@ const callPythonScriptasync = async (input) => {
 
 const getGPT = async (req, res, next) => {
   const { name, url, about, icp } = req.body;
-  const employees = [
-    {
-      name: "Sam Crisco",
-      url: "linkedin.com/in/afdafdafda",
-      about:
-        "and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.",
-      company: "pizap",
-    },
-  ];
+  // const employees = [
+  //   {
+  //     name: "Sam Crisco",
+  //     url: "linkedin.com/in/afdafdafda",
+  //     about:
+  //       "and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.",
+  //     company: "pizap",
+  //   },
+  // ];
   try {
     const accessToken = await getLinkedinAccessToken();
     const linkedin = LinkedIn.init(accessToken);
