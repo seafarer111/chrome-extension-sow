@@ -5,8 +5,8 @@ import { OpenAIChat } from "langchain/llms/openai";
 import { BufferMemory } from "langchain/memory";
 import { LLMChain } from "langchain/chains";
 import { PromptTemplate } from "langchain/prompts";
-import { spawn } from "child_process";
-// import { getLinkedinAccessToken } from "../utils/utils";
+// import { spawn } from "child_process";
+import { getLinkedinAccessToken } from "../utils/utils";
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
@@ -118,43 +118,34 @@ const uploadResume = async (req, res, next) => {
   });
 };
 
-const callPythonScriptasync = async (input) => {
-  return new Promise((resolve, reject) => {
-    const pythonProcess = spawn("python", ["scripts/app.py"]);
-    pythonProcess.stdin.write(input);
-    pythonProcess.stdin.end();
-    let output = "";
-    pythonProcess.stdout.on("data", (data) => {
-      output = data.toString();
-    });
-    let errorOutput = "";
-    pythonProcess.stderr.on("data", (data) => {
-      errorOutput += data.toString();
-    });
+// const callPythonScriptasync = async (input) => {
+//   return new Promise((resolve, reject) => {
+//     const pythonProcess = spawn("python", ["scripts/app.py"]);
+//     pythonProcess.stdin.write(input);
+//     pythonProcess.stdin.end();
+//     let output = "";
+//     pythonProcess.stdout.on("data", (data) => {
+//       output = data.toString();
+//     });
+//     let errorOutput = "";
+//     pythonProcess.stderr.on("data", (data) => {
+//       errorOutput += data.toString();
+//     });
 
-    pythonProcess.on("exit", (code) => {
-      if (code === 0) {
-        const jsonOutput = JSON.parse(output);
-        console.log(jsonOutput);
-        resolve(output);
-      } else {
-        reject(errorOutput);
-      }
-    });
-  });
-};
+//     pythonProcess.on("exit", (code) => {
+//       if (code === 0) {
+//         const jsonOutput = JSON.parse(output);
+//         console.log(jsonOutput);
+//         resolve(output);
+//       } else {
+//         reject(errorOutput);
+//       }
+//     });
+//   });
+// };
 
 const getGPT = async (req, res, next) => {
   const { name, url, about, icp } = req.body;
-  // const employees = [
-  //   {
-  //     name: "Sam Crisco",
-  //     url: "linkedin.com/in/afdafdafda",
-  //     about:
-  //       "and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.and tell me the pros and cons of this person in this roll. Include their strengths and weaknesses in this roll and what we should focus on in an interview with them for the position.",
-  //     company: "pizap",
-  //   },
-  // ];
   try {
     const accessToken = await getLinkedinAccessToken();
     const linkedin = LinkedIn.init(accessToken);
