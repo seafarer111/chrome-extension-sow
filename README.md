@@ -2,12 +2,13 @@
 
 ### frontend
 
-`npm i`
-`npm start`
+1. `npm i`
+2. `npm start`
 
 ### backend
 
 create .env file from the .env.example - copy the content
-`npm i`
-`npm run migrate`
-`npm run dev`
+
+1. `npm i`
+2. `npm run migrate`
+3. `npm run dev`
