@@ -1,5 +1,7 @@
 # chrome-extension-sow
 
+node version 18.16.x
+
 ### frontend
 
 1. `npm i`
