@@ -58,12 +58,12 @@ const Lookups = () => {
     const sel = companies.filter((item) => (item.name = selectedCom));
     console.log(sel[0])
     const res = await axios.post(`${siteConfig.apiUrl}/company/gpt`, sel[0]);
-    // if (res.data.ok) {
-    //   setPersons(res.data.data);
-    //   setSectedOne(res.data.data[0]);
-    // } else {
-    //   alert(res.data.data + ' with Linkedin API.')
-    // }
+    if (res.data.ok) {
+      setPersons(res.data.data);
+      setSectedOne(res.data.data[0]);
+    } else {
+      alert(res.data.data + ' with Linkedin API.')
+    }
     setIsLoading(false);
   };
 
