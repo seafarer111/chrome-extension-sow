@@ -3,7 +3,6 @@ import { InputText, MyTextArea } from '../components/Input';
 import MyCombobox from '../components/Combobox';
 import axios from 'axios';
 import siteConfig from '../config/site.config';
-import { useEffect } from 'react';
 import LoadingSpnner from '../components/Spinner';
 import { useRef } from 'react';
 
@@ -12,9 +11,11 @@ const Recruiting = () => {
   const [profileLink, setProfileLink] = useState('');
   const [type, setType] = useState('resume');
   const [resume, setResume] = useState(null);
-  const [options, setOptions] = useState([]);
-  const [companies, setCompanies] = useState([]);
-  const [selectedCom, setSelectedCom] = useState(null);
+  const companies = JSON.parse(localStorage.getItem('sowcs')) || [];
+  const [selectedCompany, setSelectedCompany] = useState((companies.length > 0 && companies[0]) || null);
+  const options = companies?.map((item) => {
+    return item.companyName
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState('');
   const resultRef = useRef(null);
@@ -46,8 +47,8 @@ const Recruiting = () => {
     if (jobDesc) {
       const formData = new FormData();
       formData.append('jobDesc', jobDesc);
-      formData.append('company', selectedCom.name);
-      formData.append('icp', selectedCom.icp);
+      formData.append('company', selectedCompany.name);
+      formData.append('icp', selectedCompany.icp);
       formData.append('resume', resume);
       const config = {
         headers: {
@@ -81,22 +82,9 @@ const Recruiting = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      const res = await axios.get(`${siteConfig.apiUrl}/company/all`);
-      setCompanies(res.data.data);
-      const coms = res.data.data.map((com) => {
-        return com.name;
-      });
-      setOptions(coms);
-      setSelectedCom(res.data.data[0]);
-    };
-    fetchCompanies();
-  }, []);
-
-  const handleOptionSelect = (com) => {
-    const scom = companies.filter((company) => company.name === com);
-    setSelectedCom(scom[0]);
+  const handleOptionSelect = (option) => {
+    const company = companies.filter((company) => company.companyName === option);
+    setSelectedCompany(company[0]);
   };
 
   const handleDescriptionChange = (value) => {

@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import MyCombobox from '../components/Combobox';
 import { InputText, MyTextArea } from '../components/Input';
-import { getAll } from '../api/company';
 import ListBox from '../components/ListBox';
 import Button from '../components/Button';
 import LoadingSpnner from '../components/Spinner';
 import axios from 'axios';
-import siteConfig from '../config/site.config';
+import { getLinkedinAccessToken } from '../../../utils/utils';
 
 const Lookups = () => {
-  const [companies, setCompanies] = useState([]);
-  const [options, setOptions] = useState([]);
-  const [selectedCom, setSelectedCom] = useState('');
-  const [persons, setPersons] = useState([]);
+  const companies = JSON.parse(localStorage.getItem('sowcs')) || [];
+  const options = companies?.map((item) => {
+    return item.companyName
+  });
+  const [selectedCompany, setSelectedCompany] = useState(companies[0]);
+  const [employees, setEmployees] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selecteOne, setSectedOne] = useState({
     name: '',
@@ -20,25 +21,9 @@ const Lookups = () => {
     url: '',
   });
 
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      const res = await axios.get(`${siteConfig.apiUrl}/company/all`);
-      if (res.data.ok) {
-        const data = res.data.data.map((item) => {
-          return item?.name;
-        });
-        setOptions(data);
-        setCompanies(res.data.data);
-        setSelectedCom(data[0]);
-      } else {
-        alert('Something went wrong.')
-      }
-    };
-    fetchCompanies();
-  }, []);
-
-  const handleSelectedOption = async (opt) => {
-    setSelectedCom(opt);
+  const handleSelectedOption = async (option) => {
+    const item = companies.filter(com => com.companyName === option);
+    setSelectedCompany(item[0]);
   };
 
   const handleSelectPerson = (person) => {
@@ -46,26 +31,70 @@ const Lookups = () => {
   };
 
   const handlePersonCheck = (person, check) => {
-    const updated = persons.map((p) => {
+    const updated = employees.map((p) => {
       if (p.name === person.name) return { ...p, matched: check };
       else return { ...p };
     });
-    setPersons(updated);
+    setEmployees(updated);
+  };
+
+  const searchCompany = async () => {
+    try {
+      const response = await axios.get(
+        'https://api.linkedin.com/v2/search',
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('linkedAccessToken')}`,
+            'X-Restli-Protocol-Version': '2.0.0',
+          },
+          params: {
+            q: selectedCompany.companyName,
+            company: true,
+          },
+        }
+      );
+      const companyUrn = response.data.elements[0].targetUrn;
+      getCompanyEmployees(companyUrn);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Retrieve employees of company
+  const getCompanyEmployees = async (companyUrn) => {
+    try {
+      const response = await axios.get(
+        `https://api.linkedin.com/v2/companies/${companyUrn}/employees`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('linkedAccessToken')}`,
+            'X-Restli-Protocol-Version': '2.0.0',
+          },
+        }
+      );
+      console.log(response.data.elements)
+      setEmployees(response.data.elements);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleSearchCompany = async () => {
     setIsLoading(true);
-    console.log(companies)
-    const com = companies.filter((item) =>
-      item.name === selectedCom
-    );
-    const res = await axios.post(`${siteConfig.apiUrl}/company/gpt`, com[0]);
-    if (res.data.ok) {
-      setPersons(res.data.data);
-      setSectedOne(res.data.data[0]);
-    } else {
-      alert(res.data.data + ' with Linkedin API.')
-    }
+    await searchCompany();
+    // const company = companies.filter((item) =>
+    //   item.companName === selectedCom
+    // );
+    // console.log(company)
+
+
+    // const res = await axios.post(`${siteConfig.apiUrl}/company/gpt`, com[0]);
+    // if (res.data.ok) {
+    //   setPersons(res.data.data);
+    //   setSectedOne(res.data.data[0]);
+    // } else {
+    //   alert(res.data.data + ' with Linkedin API.')
+    // }
     setIsLoading(false);
   };
 
@@ -79,7 +108,7 @@ const Lookups = () => {
       {isLoading && <LoadingSpnner />}
       <>
         <ListBox
-          data={persons}
+          data={employees}
           selected={selecteOne}
           handleSelect={handleSelectPerson}
           handleCheck={handlePersonCheck}

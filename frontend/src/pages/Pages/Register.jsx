@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import { InputText, MyTextArea } from '../components/Input';
 import Button from '../components/Button';
-import { create } from '../api/company';
-import LoadingSpnner from '../components/Spinner';
 
 const Register = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [url, setUrl] = useState('');
   const [companyIntroduction, setCompanyIntroduction] = useState('');
@@ -13,9 +10,11 @@ const Register = () => {
   const [others, setOthers] = useState('');
 
   const handleRegister = async (e) => {
-    setIsLoading(true);
-    await create({ companyName, url, companyIntroduction, icp });
-    setIsLoading(false);
+    const compaines = JSON.parse(localStorage.getItem('sowcs')) || [];
+    const data = {
+      companyName, url, companyIntroduction, icp
+    }
+    localStorage.setItem('sowcs', JSON.stringify([...compaines, data]))
     alert('Successfully Registered!')
     setCompanyName('');
     setUrl('');
@@ -26,7 +25,6 @@ const Register = () => {
 
   return (
     <div className="main-container">
-      {isLoading && <LoadingSpnner />}
       <InputText
         placeholder="Company Name"
         value={companyName}

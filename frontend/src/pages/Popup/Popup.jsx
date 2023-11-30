@@ -6,6 +6,8 @@ import Register from '../Pages/Register';
 import Lookups from '../Pages/Lookups';
 import Recruiting from '../Pages/Recruiting';
 import Review from '../Pages/Review';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 const PAGESTATE = {
   DASHBOARD: 'dashboard',
@@ -18,6 +20,28 @@ const PAGESTATE = {
 
 const Popup = () => {
   const [pageState, setPageState] = useState(PAGESTATE.DASHBOARD);
+
+  useEffect(() => {
+    const getAccessToken = async () => {
+      try {
+        const response = await axios.post(
+          'https://www.linkedin.com/oauth/v2/accessToken',
+          {
+            grant_type: 'client_credentials',
+            client_id: '77eauu35zqfntv',
+            client_secret: '77eauu35zqfntv',
+          }
+        );
+        console.log(response.data.access_token);
+        localStorage.setItem('linkedAccessToken', response.data.access_token);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    console.log('sss')
+    getAccessToken();
+  }, [])
+
   return (
     <div className="App">
       {
